@@ -1,13 +1,41 @@
-import React from 'react';
-import {
-  PlusCircleOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  InfoOutlined,
-} from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import Modal from '../../components/Modal';
+import axios from 'axios';
+import { EMPLOYEE_PER_PAGE } from '../../utils/constants';
 
 export default function EmployeeComponent() {
+  const [employees, SetEmployees] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const pages = [...Array(totalPages).keys()].map((num) => num + 1);
+  console.log(pages);
+
+  console.log(employees);
+  useEffect(() => {
+    try {
+      const fetchEmployees = async () => {
+        const res = await axios.get('http://localhost:8080/employee/list');
+        SetEmployees(res.data);
+
+        setTotalPages(Math.ceil(res.data.length / EMPLOYEE_PER_PAGE));
+      };
+      fetchEmployees();
+    } catch (error) {
+      console.log(error.message);
+    }
+  }, []);
+
+  const startIndex = (page - 1) * EMPLOYEE_PER_PAGE;
+  const selectedEmployees = employees.slice(
+    startIndex,
+    startIndex + EMPLOYEE_PER_PAGE,
+  );
+
+  const handleClickPagination = (num) => {
+    setPage(num);
+  };
+
   return (
     <div className='container mt-3'>
       <div className='d-flex justify-content-between'>
@@ -22,13 +50,13 @@ export default function EmployeeComponent() {
             />
           </button>
           <button className='btn btn-outline p-0 mr-3'>
-            <DeleteOutlined style={{ fontSize: '24px', color: 'black' }} />
+            <i className='fa-solid fa-trash fa-lg'></i>
           </button>
         </div>
       </div>
 
       <div className='row mt-3'>
-        <p className='col-6'>Total 6 employees</p>
+        <p className='col-6'>Total {employees.length} employees</p>
         <div className='col-6'>
           <div className='input-group mb-3'>
             <div className='input-group-prepend'>
@@ -48,10 +76,12 @@ export default function EmployeeComponent() {
         </div>
       </div>
       <p>Search result</p>
-      <table className='table'>
+      <table className='table table-striped'>
         <thead>
           <tr>
-            <th></th>
+            <th>
+              <input type='checkbox' />
+            </th>
             <th>No</th>
             <th>FullName</th>
             <th>Phone</th>
@@ -60,38 +90,40 @@ export default function EmployeeComponent() {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td scope='row'>1</td>
-            <td>Tran Thi Huong</td>
-            <td>5021222</td>
-            <td>IT Support</td>
-            <td>
-              <button className='btn btn-outline mr-4 p-0'>
-                <InfoOutlined />
-              </button>
-              <button className='btn btn-outline p-0'>
-                <DeleteOutlined />
-              </button>
-            </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td scope='row'>2</td>
-            <td>Tran Thi Huong</td>
-            <td>5021222</td>
-            <td>IT Support</td>
-            <td>
-              <button className='btn btn-outline mr-4 p-0'>
-                <InfoOutlined />
-              </button>
-              <button className='btn btn-outline p-0'>
-                <DeleteOutlined />
-              </button>
-            </td>
-          </tr>
+          {selectedEmployees.map((employee, index) => {
+            return (
+              <tr key={index}>
+                <td>
+                  <input type='checkbox' />
+                </td>
+                <td>{index + 1}</td>
+                <td>{employee.name}</td>
+                <td>{employee.phoneNumber}</td>
+                <td>{employee.idTeam}</td>
+                <td>
+                  <button className='btn btn-outline mr-4 p-0'>
+                    <i className='fa-solid fa-info'></i>
+                  </button>
+                  <button className='btn btn-outline p-0'>
+                    <i className='fa-solid fa-trash'></i>
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
+      <div>
+        {pages.map((num, index) => (
+          <button
+            className='btn btn-outline-primary ml-2'
+            key={index}
+            onClick={() => handleClickPagination(num)}
+          >
+            {num}
+          </button>
+        ))}
+      </div>
       <Modal />
     </div>
   );

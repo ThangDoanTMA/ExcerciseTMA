@@ -103,6 +103,7 @@ export default function DetailEmployee() {
                         className='form-control'
                         id='inlineFormInputGroup'
                         value={'17-01-2001'}
+                        readOnly
                       />
                     </div>
                   </div>
@@ -118,6 +119,7 @@ export default function DetailEmployee() {
                         className='form-control'
                         id='inlineFormInputGroup'
                         value={'IT Support'}
+                        readOnly
                       />
                     </div>
                   </div>
@@ -135,6 +137,7 @@ export default function DetailEmployee() {
                         className='form-control'
                         id='inlineFormInputGroup'
                         value={'Quy Nhon'}
+                        readOnly
                       />
                     </div>
                   </div>
@@ -150,6 +153,7 @@ export default function DetailEmployee() {
                         className='form-control'
                         id='inlineFormInputGroup'
                         value={'2'}
+                        readOnly
                       />
                     </div>
                   </div>

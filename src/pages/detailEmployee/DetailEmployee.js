@@ -1,15 +1,171 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import swal from 'sweetalert';
 
-export default function DetailEmployee() {
+export default function DetailEmployee(props) {
+  const [employee, setEmployee] = useState({});
+  const [teams, setTeams] = useState({});
+  const employeeId = props.match.params.id;
+  const [workingList, setWorkingList] = useState([]);
+  const [advanceList, setAdvanceList] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const res = await Promise.all([
+        axios.get('http://localhost:8080/employee/' + employeeId),
+        axios.get('http://localhost:8080/team/list'),
+      ]);
+      const employee = res[0].data.data;
+      const teams = res[1].data;
+      const renderTeam = () => {
+        for (let i = 0; i < teams.length; i++) {
+          if (teams[i].id === employee.idTeam) {
+            employee.team = teams[i].teamName;
+          }
+        }
+      };
+      await renderTeam();
+      await setEmployee(employee);
+      await setTeams(teams);
+      await setWorkingList(employee.working);
+      await setAdvanceList(employee.advances);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+  useEffect(() => {}, [workingList]);
+
+  const renderWorkingTable = () => {
+    // if (workingList !== null || workingList.length !== 0)
+    if (employee.working !== null) {
+      return workingList.map((data, index) => {
+        return (
+          <tr key={index}>
+            <td scope='row'>{index + 1}</td>
+            <td>{data.dateWorking}</td>
+            <td>{data.hourWorking}</td>
+            <td>
+              <button
+                className='btn btn-outline p-0 ml-3'
+                onClick={() => {
+                  const newWorkingList = workingList.splice(index, 1);
+                  setEmployee(employee);
+                  try {
+                    const updateEmployees = async () => {
+                      const res = await axios.put(
+                        'http://localhost:8080/employee/update=' + employee.id,
+                        employee,
+                      );
+                    };
+                    updateEmployees();
+                    setWorkingList(employee.working);
+                    console.log('newWorkingList', newWorkingList);
+                    console.log('employee.working', employee.working);
+                    console.log('employee', employee);
+                    // fetchData();
+                  } catch (error) {
+                    console.log(error.message);
+                  }
+                }}
+              >
+                <i className='fa-solid fa-trash-can fa-lg'></i>
+              </button>
+            </td>
+          </tr>
+        );
+      });
+    } else {
+      return (
+        <tr>
+          <td scope='row'></td>
+          <td></td>
+          <td></td>
+          <td>
+            {/* <button className='btn btn-outline p-0 ml-3'>
+          <i className='fa-solid fa-trash-can fa-lg'></i>
+        </button> */}
+          </td>
+        </tr>
+      );
+    }
+  };
+
+  const renderAdvanceList = () => {
+    // if (advanceList !== null || advanceList.length !== 0)
+    if (employee.advances !== null) {
+      return advanceList.map((data, index) => {
+        return (
+          <tr key={index}>
+            <td scope='row'>{index + 1}</td>
+            <td>{data.dateAdvance}</td>
+            <td>{data.moneyAdvance}$</td>
+            <td>
+              <button className='btn btn-outline p-0 ml-3'>
+                <i className='fa-solid fa-trash-can fa-lg'></i>
+              </button>
+            </td>
+          </tr>
+        );
+      });
+    } else {
+      return (
+        <tr>
+          <td scope='row'></td>
+          <td></td>
+          <td></td>
+          <td>
+            {/* <button className='btn btn-outline p-0 ml-3'>
+          <i className='fa-solid fa-trash-can fa-lg'></i>
+        </button> */}
+          </td>
+        </tr>
+      );
+    }
+  };
+
   return (
-    <div>
+    <div className='container'>
       <div className='d-flex justify-content-between mt-3'>
-        <h4 className=''>Vo Chi Thanh</h4>
+        <h4 className=''>{employee.name}</h4>
         <div>
           <button className='btn btn-outline mr-4 p-0'>
             <i className='fa-solid fa-pen-to-square fa-lg'></i>
           </button>
-          <button className='btn btn-outline p-0 mr-3'>
+          <button
+            className='btn btn-outline p-0 mr-3'
+            onClick={() => {
+              swal({
+                title: 'Are you sure?',
+                text: 'Once deleted, you will not be able to recover this data!',
+                icon: 'warning',
+                buttons: true,
+                dangerMode: true,
+              }).then((willDelete) => {
+                if (willDelete) {
+                  try {
+                    const deleteEmployee = async () => {
+                      const res = await axios.post(
+                        'http://localhost:8080/employee/delete=' + employee.id,
+                      );
+                    };
+                    deleteEmployee();
+                  } catch (error) {
+                    console.log(error.message);
+                  }
+                  swal('This employee has been deleted!', {
+                    icon: 'success',
+                  });
+                  props.history.goBack();
+                } else {
+                  swal('Your data is safe!');
+                }
+              });
+            }}
+          >
             <i className='fa-solid fa-trash-can fa-lg'></i>
           </button>
         </div>
@@ -25,11 +181,11 @@ export default function DetailEmployee() {
             // style={{ margin: '0 auto' }}
             className='d-flex justify-content-center'
           >
-            <span className='badge badge-primary mr-2'>No:2</span>
-            <span className='badge badge-info'>Age: 22</span>
+            <span className='badge badge-primary mr-2'>No:{employee.id}</span>
+            <span className='badge badge-info'>Age: {employee.age}</span>
           </div>
           <div className='d-flex justify-content-center mt-2'>
-            <span className='badge badge-warning'>Sex: Male</span>
+            <span className='badge badge-warning'>Sex: {employee.sex}</span>
           </div>
         </div>
         <div className='col-8'>
@@ -102,7 +258,7 @@ export default function DetailEmployee() {
                         type='text'
                         className='form-control'
                         id='inlineFormInputGroup'
-                        value={'17-01-2001'}
+                        // value={employee.startDay}
                         readOnly
                       />
                     </div>
@@ -118,7 +274,7 @@ export default function DetailEmployee() {
                         type='text'
                         className='form-control'
                         id='inlineFormInputGroup'
-                        value={'IT Support'}
+                        // value={employee.team}
                         readOnly
                       />
                     </div>
@@ -136,7 +292,7 @@ export default function DetailEmployee() {
                         type='text'
                         className='form-control'
                         id='inlineFormInputGroup'
-                        value={'Quy Nhon'}
+                        // value={employee.address}
                         readOnly
                       />
                     </div>
@@ -152,7 +308,7 @@ export default function DetailEmployee() {
                         type='text'
                         className='form-control'
                         id='inlineFormInputGroup'
-                        value={'2'}
+                        // value={employee.salaryPerHour}
                         readOnly
                       />
                     </div>
@@ -183,18 +339,7 @@ export default function DetailEmployee() {
                     <th>Option</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td scope='row'>1</td>
-                    <td>17-01-2021</td>
-                    <td>8</td>
-                    <td>
-                      <button className='btn btn-outline p-0 ml-3'>
-                        <i className='fa-solid fa-trash-can fa-lg'></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody>{renderWorkingTable()}</tbody>
               </table>
             </div>
             <div
@@ -220,18 +365,7 @@ export default function DetailEmployee() {
                     <th>Option</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td scope='row'>1</td>
-                    <td>17-01-2021</td>
-                    <td>60$</td>
-                    <td>
-                      <button className='btn btn-outline p-0 ml-3'>
-                        <i className='fa-solid fa-trash-can fa-lg'></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody>{renderAdvanceList()}</tbody>
               </table>
             </div>
             <div
@@ -244,7 +378,10 @@ export default function DetailEmployee() {
                 <h4 className='mb-3'>STATISTICS</h4>
                 <div>
                   <p>All salary : </p>
-                  <p>Number of working days : </p>
+                  <p>
+                    Number of working days :
+                    {employee.working === null ? '' : workingList.length}
+                  </p>
                   <p>Total get : </p>
                   <p>Total advances : </p>
                   <p>Summary: </p>

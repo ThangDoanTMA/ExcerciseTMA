@@ -1,21 +1,178 @@
-import React from 'react';
-import { Button } from 'antd';
+import React, { useState, useEffect } from 'react';
 import { PlusCircleOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import swal from 'sweetalert';
 
 export default function TeamComponent() {
+  const [employees, SetEmployees] = useState([]);
+  const [teams, SetTeams] = useState([]);
+  const [employeesTeam, setEmployeesTeam] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState({});
+  const [team, setTeam] = useState({});
+
+  const fetchData = async () => {
+    try {
+      const res = await Promise.all([
+        axios.get('http://localhost:8080/employee/list'),
+        axios.get('http://localhost:8080/team/list'),
+      ]);
+      const employees = res[0].data;
+      const teams = res[1].data;
+      await employees.forEach((employee) => {
+        for (let i = 0; i < teams.length; i++) {
+          if (employee.idTeam === teams[i].id) {
+            employee.team = teams[i].teamName;
+          }
+        }
+      });
+      await SetEmployees(employees);
+      await SetTeams(teams);
+      await setEmployeesTeam(
+        employees.filter((employee) => employee.idTeam === teams[0].id),
+      );
+      await setSelectedTeam(teams[0]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const renderTeams = () => {
+    return teams.map((team, index) => {
+      return (
+        <tr key={index}>
+          <td scope='row'>{index + 1}</td>
+          <td>{team.teamName}</td>
+          <td>
+            <button
+              className='btn btn-outline p-0'
+              onClick={() => {
+                setSelectedTeam(team);
+                setEmployeesTeam(
+                  employees.filter(
+                    (employee) => employee.team === selectedTeam.teamName,
+                  ),
+                );
+              }}
+            >
+              <i className='fa-solid fa-clipboard-list'></i>
+            </button>
+          </td>
+        </tr>
+      );
+    });
+  };
+
+  const renderNameTeamSelected = () => {
+    return `Result all employee team ${selectedTeam.teamName} - Total ${employeesTeam.length} employees`;
+  };
+
+  /*--------------------------HANDLE ADD TEAM------------------------------------------------ */
+  const renderEmployeesSelected = () => {
+    return employeesTeam.map((employee, index) => {
+      return (
+        <tr key={index}>
+          <td scope='row'>{index + 1}</td>
+          <td>{employee.name}</td>
+          <td>{employee.phoneNumber}</td>
+          <td>{employee.address}</td>
+          <td>{employee.sex}</td>
+        </tr>
+      );
+    });
+  };
+
+  const handleChangeInput = (e) => {
+    setTeam({
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    try {
+      const addTeam = async () => {
+        const res = await axios.post('http://localhost:8080/team/create', team);
+      };
+      addTeam();
+      swal({
+        title: 'Good job!',
+        text: 'Created a new team!',
+        icon: 'success',
+        button: 'Yahoooo!',
+      });
+      fetchData();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /*-------------------------------------------------------------------------- */
   return (
     <div className='container mt-3'>
       <div className='d-flex justify-content-between'>
         <h3 className='display-5'>Team</h3>
         <div>
-          <button className='btn btn-outline p-0 mr-3'>
+          <button
+            className='btn btn-outline p-0 mr-3'
+            data-toggle='modal'
+            data-target='#exampleModal'
+          >
             <PlusCircleOutlined style={{ fontSize: '24px', color: 'black' }} />
           </button>
         </div>
       </div>
+      <div>
+        <div
+          className='modal fade'
+          id='exampleModal'
+          tabIndex={-1}
+          role='dialog'
+          aria-labelledby='exampleModalLabel'
+          aria-hidden='true'
+        >
+          <div className='modal-dialog' role='document'>
+            <div className='modal-content'>
+              <div className='modal-header bg-primary text-white'>
+                <h5 className='modal-title' id='exampleModalLabel'>
+                  Add a new Team
+                </h5>
+              </div>
+              <form onSubmit={handleSubmit} className='modal-body'>
+                <div className='form-group row'>
+                  <div className='col'>
+                    <small className='form-text text-muted'>Team Name *</small>
+                    <input
+                      className='form-control'
+                      name='teamName'
+                      type='text'
+                      placeholder='Enter a new team'
+                      onChange={handleChangeInput}
+                    />
+                  </div>
+                </div>
+                <div className='modal-footer'>
+                  <button
+                    type='submit'
+                    className='btn btn-outline'
+                    data-dismiss='modal'
+                  >
+                    CANCEL
+                  </button>
+                  <button type='submit' className='btn btn-outline'>
+                    SUBMIT
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className='row mt-3'>
         <div className='col-4'>
-          <p>Total 3 teams</p>
+          <p>Total {teams.length} teams</p>
           <table className='table table-striped mt-3'>
             <thead>
               <tr>
@@ -24,21 +181,11 @@ export default function TeamComponent() {
                 <th>Detail</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td scope='row'>1</td>
-                <td>IT Support</td>
-                <td>
-                  <button className='btn btn-outline p-0'>
-                    <i className='fa-solid fa-clipboard-list'></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
+            <tbody>{renderTeams()}</tbody>
           </table>
         </div>
         <div className='col-8'>
-          <p>Result all employee team Manager - Total 3 employees</p>
+          <p>{renderNameTeamSelected()}</p>
           <table className='table table-striped mt-3'>
             <thead>
               <tr>
@@ -49,15 +196,7 @@ export default function TeamComponent() {
                 <th>Sex</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td scope='row'>1</td>
-                <td>Tran Thi Huong</td>
-                <td>097845454</td>
-                <td>TP Ho Chi Minh</td>
-                <td>Female</td>
-              </tr>
-            </tbody>
+            <tbody>{renderEmployeesSelected()}</tbody>
           </table>
         </div>
       </div>

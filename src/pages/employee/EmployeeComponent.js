@@ -3,6 +3,7 @@ import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { EMPLOYEE_PER_PAGE } from '../../utils/constants';
 import swal from 'sweetalert';
+import { NavLink } from 'react-router-dom';
 
 export default function EmployeeComponent() {
   const [employees, SetEmployees] = useState([]);
@@ -15,6 +16,9 @@ export default function EmployeeComponent() {
   const [employee, setEmployee] = useState({});
   const [search, setSearch] = useState('');
   const defaultSexOption = 'Male';
+  const [checkedState, setCheckedState] = useState(
+    new Array(employees.length).fill(false),
+  );
 
   // useEffect(() => {
   //   try {
@@ -39,13 +43,14 @@ export default function EmployeeComponent() {
         for (let i = 0; i < teams.length; i++) {
           if (employee.idTeam === teams[i].id) {
             employee.team = teams[i].teamName;
+            employee.selected = false;
           }
         }
       });
       await SetEmployees(employees);
       await SetTeams(teams);
-    } catch {
-      throw Error('Promise failed');
+    } catch (err) {
+      console.log(err);
     }
   };
   useEffect(() => {
@@ -53,6 +58,10 @@ export default function EmployeeComponent() {
   }, []);
 
   useEffect(() => {}, [employees]);
+
+  console.log(employees);
+
+  /*-----------------------HANDLE FORM INPUT------------------------------------------------ */
 
   const handleChangeInput = (e) => {
     setEmployee({
@@ -69,7 +78,6 @@ export default function EmployeeComponent() {
           employee,
         );
       };
-      console.log(employee);
       addEmployee();
       swal({
         title: 'Good job!',
@@ -78,11 +86,11 @@ export default function EmployeeComponent() {
         button: 'Yahoooo!',
       });
       fetchData();
-      e.target.value = '';
     } catch (error) {
       console.log(error);
     }
   };
+  /*------------------------------------------------------------------------------------ */
 
   /*-----------------------HANDLE SEARCH------------------------------------------------ */
 
@@ -170,6 +178,43 @@ export default function EmployeeComponent() {
   }
   /*------------------------------------------------------------------------- */
 
+  const handleDeleteList = () => {
+    swal({
+      title: 'Are you sure?',
+      text: 'Once deleted, you will not be able to recover this data!',
+      icon: 'warning',
+      buttons: true,
+      dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        employees.forEach((employee) => {
+          if (employee.selected) {
+            try {
+              const deleteEmployee = async () => {
+                const res = await axios.post(
+                  'http://localhost:8080/employee/delete=' + employee.id,
+                );
+              };
+              deleteEmployee();
+            } catch (error) {
+              console.log(error.message);
+            }
+            swal('This employee has been deleted!', {
+              icon: 'success',
+            });
+          }
+        });
+        const remainEmployees = employees.filter(
+          (remainEmployee) => remainEmployee.selected === false,
+        );
+        SetEmployees(remainEmployees);
+      } else {
+        swal('Your data is safe!');
+      }
+    });
+    // fetchData();
+  };
+
   return (
     <div className='container mt-3'>
       <div className='d-flex justify-content-between'>
@@ -183,7 +228,10 @@ export default function EmployeeComponent() {
               type='button'
             />
           </button>
-          <button className='btn btn-outline p-0 mr-3'>
+          <button
+            className='btn btn-outline p-0 mr-3'
+            onClick={handleDeleteList}
+          >
             <i className='fa-solid fa-trash fa-lg'></i>
           </button>
         </div>
@@ -218,7 +266,18 @@ export default function EmployeeComponent() {
         <thead>
           <tr>
             <th>
-              <input type='checkbox' />
+              <input
+                type='checkbox'
+                onChange={(e) => {
+                  let checked = e.target.checked;
+                  SetEmployees(
+                    employees.map((data) => {
+                      data.selected = checked;
+                      return data;
+                    }),
+                  );
+                }}
+              />
             </th>
             <th>No</th>
             <th>FullName</th>
@@ -232,16 +291,35 @@ export default function EmployeeComponent() {
             return (
               <tr key={index}>
                 <td>
-                  <input type='checkbox' />
+                  <input
+                    onChange={(event) => {
+                      let checked = event.target.checked;
+                      SetEmployees(
+                        employees.map((data) => {
+                          if (employee.id === data.id) {
+                            data.selected = checked;
+                          }
+                          return data;
+                        }),
+                        console.log(event),
+                      );
+                    }}
+                    type='checkbox'
+                    checked={employee.selected}
+                  />
                 </td>
                 <td>{index + 1}</td>
                 <td>{employee.name}</td>
                 <td>{employee.phoneNumber}</td>
                 <td>{employee.team ? employee.team : 'Not belong any team'}</td>
                 <td>
-                  <button className='btn btn-outline mr-4 p-0'>
+                  <NavLink
+                    exact
+                    to={'/detailemployee/' + employee.id}
+                    className='mr-4'
+                  >
                     <i className='fa-solid fa-info'></i>
-                  </button>
+                  </NavLink>
                   <button
                     className='btn btn-outline p-0'
                     onClick={() => {
@@ -289,7 +367,7 @@ export default function EmployeeComponent() {
       <div
         className='modal fade'
         id='modelId'
-        // tabIndex={-1}
+        tabIndex={-1}
         role='dialog'
         aria-labelledby='modelTitleId'
         aria-hidden='true'
@@ -297,7 +375,7 @@ export default function EmployeeComponent() {
         <div className='modal-dialog' role='document'>
           <div className='modal-content border-0'>
             <div className='modal-header  bg-primary text-white'>
-              <h5 className='modal-title'>Add new Employee</h5>
+              <h5 className='modal-title'>Add a new Employee</h5>
             </div>
             <form onSubmit={handleSubmit} className='modal-body'>
               <div className='form-group'>

@@ -59,14 +59,15 @@ export default function EmployeeComponent() {
 
   useEffect(() => {}, [employees]);
 
-  console.log(employees);
-
   /*-----------------------HANDLE FORM INPUT------------------------------------------------ */
 
   const handleChangeInput = (e) => {
     setEmployee({
       ...employee,
       [e.target.name]: e.target.value,
+      working: [],
+      advances: [],
+      avatar: 'https://i.pravatar.cc/150?img=13',
     });
   };
   const handleSubmit = (e) => {
@@ -283,7 +284,7 @@ export default function EmployeeComponent() {
             <th>FullName</th>
             <th>Phone</th>
             <th>Team</th>
-            <th>Option</th>
+            <th className='text-center'>Option</th>
           </tr>
         </thead>
         <tbody>
@@ -312,7 +313,7 @@ export default function EmployeeComponent() {
                 <td>{employee.name}</td>
                 <td>{employee.phoneNumber}</td>
                 <td>{employee.team ? employee.team : 'Not belong any team'}</td>
-                <td>
+                <td className='text-center'>
                   <NavLink
                     exact
                     to={'/detailemployee/' + employee.id}

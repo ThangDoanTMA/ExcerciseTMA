@@ -45,7 +45,7 @@ export default function TeamComponent() {
         <tr key={index}>
           <td scope='row'>{index + 1}</td>
           <td>{team.teamName}</td>
-          <td>
+          <td className='text-center'>
             <button
               className='btn btn-outline p-0'
               onClick={() => {
@@ -178,7 +178,7 @@ export default function TeamComponent() {
               <tr>
                 <th>No</th>
                 <th>Name Team</th>
-                <th>Detail</th>
+                <th className='text-center'>Detail</th>
               </tr>
             </thead>
             <tbody>{renderTeams()}</tbody>

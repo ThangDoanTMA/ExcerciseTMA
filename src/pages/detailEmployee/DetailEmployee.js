@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import swal from 'sweetalert';
+import { useForm } from 'react-hook-form';
 
 export default function DetailEmployee(props) {
   const [employee, setEmployee] = useState({});
@@ -198,13 +199,25 @@ export default function DetailEmployee(props) {
     setEmployee({
       ...employee,
       [e.target.name]: e.target.value,
-      avatar: 'https://i.pravatar.cc/150?img=13',
     });
-    console.log(employee);
   };
 
-  const handleSubmitUpdate = (e) => {
-    e.preventDefault();
+  // const handleSubmitUpdate = (e) => {
+  //   e.preventDefault();
+  //   updateInfoEmployee();
+  //   swal({
+  //     title: 'Good job!',
+  //     text: 'Created a new employee!',
+  //     icon: 'success',
+  //     button: 'Yahoooo!',
+  //   });
+  //   fetchData();
+  // };
+
+  const { register, handleSubmit } = useForm();
+  const onSubmit = (data) => {
+    // data.preventDefault();
+    employee.avatar = data.data[0].name;
     updateInfoEmployee();
     swal({
       title: 'Good job!',
@@ -212,7 +225,20 @@ export default function DetailEmployee(props) {
       icon: 'success',
       button: 'Yahoooo!',
     });
+    // try {
+    //   const uploadFile = async () => {
+    //     const res = await axios.post(
+    //       'http://localhost:8080/uploadfile',
+    //       data.data[0],
+    //     );
+    //   };
+    //   uploadFile();
+    // } catch (error) {
+    //   console.log(error);
+    // }
     fetchData();
+    console.log(data.data[0]);
+    console.log(employee);
   };
 
   return (
@@ -264,7 +290,16 @@ export default function DetailEmployee(props) {
       </div>
       <div className='row mt-3'>
         <div className='col-4'>
-          <img src={employee.avatar} alt='...' className='w-100 p-2' />
+          <img
+            src={'/images/' + employee.avatar}
+            alt='...'
+            className='w-100 p-2'
+            style={{ height: '400px' }}
+          />
+          {/* <form onSubmit={handleSubmit(onSubmit)}>
+            <input name='avatar' {...register('data')} type='file' />
+            <button>Submit</button>
+          </form> */}
           <div className='d-flex justify-content-center'>
             <span className='badge badge-primary mr-2'>No:{employee.id}</span>
             <span className='badge badge-info'>Age: {employee.age}</span>
@@ -370,7 +405,11 @@ export default function DetailEmployee(props) {
                   <div className='modal-header  bg-primary text-white'>
                     <h5 className='modal-title'>Update Employee</h5>
                   </div>
-                  <form onSubmit={handleSubmitUpdate} className='modal-body'>
+                  <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    // onSubmit={handleSubmitUpdate}
+                    className='modal-body'
+                  >
                     <div className='form-group'>
                       <small className='form-text text-muted'>
                         Full name employee *
@@ -403,9 +442,9 @@ export default function DetailEmployee(props) {
                             <input
                               type='file'
                               name='avatar'
+                              {...register('data')}
                               className='custom-file-input'
-                              accept='image/png, image/jpeg'
-                              onChange={handleChangeInputUpdate}
+                              // onChange={handleChangeInputUpdate}
                             />
                             <label className='custom-file-label'>
                               Choose file

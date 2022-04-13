@@ -67,7 +67,7 @@ export default function EmployeeComponent() {
       [e.target.name]: e.target.value,
       working: [],
       advances: [],
-      avatar: '/images/defaultImg.jpg',
+      avatar: 'defaultImg.jpg',
     });
   };
   const handleSubmit = (e) => {
@@ -302,7 +302,6 @@ export default function EmployeeComponent() {
                           }
                           return data;
                         }),
-                        console.log(event),
                       );
                     }}
                     type='checkbox'

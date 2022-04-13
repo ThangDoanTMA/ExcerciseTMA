@@ -404,6 +404,7 @@ export default function DetailEmployee(props) {
                               type='file'
                               name='avatar'
                               className='custom-file-input'
+                              accept='image/png, image/jpeg'
                               onChange={handleChangeInputUpdate}
                             />
                             <label className='custom-file-label'>

@@ -67,7 +67,7 @@ export default function EmployeeComponent() {
       [e.target.name]: e.target.value,
       working: [],
       advances: [],
-      avatar: 'https://i.pravatar.cc/150?img=13',
+      avatar: '/images/defaultImg.jpg',
     });
   };
   const handleSubmit = (e) => {

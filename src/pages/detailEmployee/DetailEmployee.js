@@ -236,6 +236,29 @@ export default function DetailEmployee(props) {
 
     fetchData();
   };
+  /*-------------------------------STATISTICS-------------------------------------------- */
+
+  const summary = () => {
+    return allSalary() - totalAdvances();
+  };
+
+  const totalGet = () => {
+    return allSalary() + totalAdvances();
+  };
+
+  const totalAdvances = () => {
+    return advanceList.reduce((total, num) => {
+      return (total += Number(num.moneyAdvance));
+    }, 0);
+  };
+
+  const allSalary = () => {
+    let totalHour = workingList.reduce((total, hours) => {
+      return (total += Number(hours.hourWorking));
+    }, 0);
+    return employee.salaryPerHour * totalHour;
+  };
+  /*-------------------------------------------------------------------------------------- */
 
   return (
     <div className='container'>
@@ -729,14 +752,22 @@ export default function DetailEmployee(props) {
               <div className='mt-4'>
                 <h4 className='mb-3'>STATISTICS</h4>
                 <div>
-                  <p>All salary : </p>
-                  <p>
-                    Number of working days :
+                  <p className='alert alert-success' role='alert'>
+                    Number of working days :{' '}
                     {employee.working === null ? ' 0' : workingList.length}
                   </p>
-                  <p>Total get : </p>
-                  <p>Total advances : </p>
-                  <p>Summary: </p>
+                  <p className='alert alert-info' role='alert'>
+                    All salary : {allSalary()}
+                  </p>
+                  <p className='alert alert-primary' role='alert'>
+                    Total advances : {totalAdvances()}
+                  </p>
+                  <p className='alert alert-warning' role='alert'>
+                    Total get : {totalGet()}
+                  </p>
+                  <p className='alert alert-danger' role='alert'>
+                    Summary: {summary()}
+                  </p>
                 </div>
               </div>
             </div>

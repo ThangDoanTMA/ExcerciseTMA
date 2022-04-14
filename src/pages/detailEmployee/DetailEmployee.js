@@ -202,18 +202,6 @@ export default function DetailEmployee(props) {
     });
   };
 
-  // const handleSubmitUpdate = (e) => {
-  //   e.preventDefault();
-  //   updateInfoEmployee();
-  //   swal({
-  //     title: 'Good job!',
-  //     text: 'Created a new employee!',
-  //     icon: 'success',
-  //     button: 'Yahoooo!',
-  //   });
-  //   fetchData();
-  // };
-
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => {
     // data.preventDefault();
@@ -225,20 +213,28 @@ export default function DetailEmployee(props) {
       icon: 'success',
       button: 'Yahoooo!',
     });
-    // try {
-    //   const uploadFile = async () => {
-    //     const res = await axios.post(
-    //       'http://localhost:8080/uploadfile',
-    //       data.data[0],
-    //     );
-    //   };
-    //   uploadFile();
-    // } catch (error) {
-    //   console.log(error);
-    // }
+
+    const image = new FormData();
+    image.append('fileData', data.data[0]);
+
+    try {
+      const uploadFile = async () => {
+        const res = await axios.post(
+          'http://localhost:8080/uploadfile',
+          image,
+          {
+            header: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+      };
+      uploadFile();
+    } catch (error) {
+      console.log(error);
+    }
+
     fetchData();
-    console.log(data.data[0]);
-    console.log(employee);
   };
 
   return (
@@ -296,10 +292,6 @@ export default function DetailEmployee(props) {
             className='w-100 p-2'
             style={{ height: '400px' }}
           />
-          {/* <form onSubmit={handleSubmit(onSubmit)}>
-            <input name='avatar' {...register('data')} type='file' />
-            <button>Submit</button>
-          </form> */}
           <div className='d-flex justify-content-center'>
             <span className='badge badge-primary mr-2'>No:{employee.id}</span>
             <span className='badge badge-info'>Age: {employee.age}</span>
@@ -407,7 +399,6 @@ export default function DetailEmployee(props) {
                   </div>
                   <form
                     onSubmit={handleSubmit(onSubmit)}
-                    // onSubmit={handleSubmitUpdate}
                     className='modal-body'
                   >
                     <div className='form-group'>
@@ -444,7 +435,6 @@ export default function DetailEmployee(props) {
                               name='avatar'
                               {...register('data')}
                               className='custom-file-input'
-                              // onChange={handleChangeInputUpdate}
                             />
                             <label className='custom-file-label'>
                               Choose file

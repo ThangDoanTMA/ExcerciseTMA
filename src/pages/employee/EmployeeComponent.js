@@ -20,17 +20,6 @@ export default function EmployeeComponent() {
     new Array(employees.length).fill(false),
   );
 
-  // useEffect(() => {
-  //   try {
-  //     const fetchEmployees = async () => {
-  //       const res = await axios.get('http://localhost:8080/employee/list');
-  //       SetEmployees(res.data);
-  //     };
-  //     fetchEmployees();
-  //   } catch (error) {
-  //     console.log(error.message);
-  //   }
-  // }, []);
   const fetchData = async () => {
     try {
       const res = await Promise.all([

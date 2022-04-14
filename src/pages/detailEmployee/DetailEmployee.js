@@ -239,11 +239,7 @@ export default function DetailEmployee(props) {
   /*-------------------------------STATISTICS-------------------------------------------- */
 
   const summary = () => {
-    return allSalary() - totalAdvances();
-  };
-
-  const totalGet = () => {
-    return allSalary() + totalAdvances();
+    return totalGet() - totalAdvances();
   };
 
   const totalAdvances = () => {
@@ -252,7 +248,7 @@ export default function DetailEmployee(props) {
     }, 0);
   };
 
-  const allSalary = () => {
+  const totalGet = () => {
     let totalHour = workingList.reduce((total, hours) => {
       return (total += Number(hours.hourWorking));
     }, 0);
@@ -757,13 +753,10 @@ export default function DetailEmployee(props) {
                     {employee.working === null ? ' 0' : workingList.length}
                   </p>
                   <p className='alert alert-info' role='alert'>
-                    All salary : {allSalary()}
+                    Total get : {totalGet()}
                   </p>
                   <p className='alert alert-primary' role='alert'>
                     Total advances : {totalAdvances()}
-                  </p>
-                  <p className='alert alert-warning' role='alert'>
-                    Total get : {totalGet()}
                   </p>
                   <p className='alert alert-danger' role='alert'>
                     Summary: {summary()}

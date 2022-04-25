@@ -146,6 +146,7 @@ export default function TeamComponent() {
                     <input
                       className='form-control'
                       name='teamName'
+                      required
                       type='text'
                       placeholder='Enter a new team'
                       onChange={handleChangeInput}

@@ -204,8 +204,9 @@ export default function DetailEmployee(props) {
 
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => {
-    // data.preventDefault();
-    employee.avatar = data.data[0].name;
+    if (data.data[0] !== undefined) {
+      employee.avatar = data.data[0].name;
+    }
     updateInfoEmployee();
     swal({
       title: 'Good job!',
@@ -233,7 +234,6 @@ export default function DetailEmployee(props) {
     } catch (error) {
       console.log(error);
     }
-
     fetchData();
   };
   /*-------------------------------STATISTICS-------------------------------------------- */
@@ -603,6 +603,7 @@ export default function DetailEmployee(props) {
                             Date Working *
                           </small>
                           <input
+                            required
                             className='form-control'
                             name='dateWorking'
                             type='date'
@@ -615,6 +616,7 @@ export default function DetailEmployee(props) {
                             Hour Working *
                           </small>
                           <input
+                            required
                             className='form-control'
                             name='hourWorking'
                             type='text'
@@ -702,6 +704,7 @@ export default function DetailEmployee(props) {
                             Date Advance *
                           </small>
                           <input
+                            required
                             className='form-control'
                             name='dateAdvance'
                             type='date'
@@ -714,6 +717,7 @@ export default function DetailEmployee(props) {
                             Money Advance *
                           </small>
                           <input
+                            required
                             className='form-control'
                             name='moneyAdvance'
                             type='text'

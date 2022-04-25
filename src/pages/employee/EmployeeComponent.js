@@ -202,7 +202,6 @@ export default function EmployeeComponent() {
         swal('Your data is safe!');
       }
     });
-    // fetchData();
   };
 
   return (
@@ -374,6 +373,7 @@ export default function EmployeeComponent() {
                 <input
                   className='form-control'
                   name='name'
+                  required
                   type='text'
                   placeholder='Enter full name'
                   onChange={handleChangeInput}
@@ -382,6 +382,7 @@ export default function EmployeeComponent() {
               <div className='form-group '>
                 <small className='form-text text-muted'>Address *</small>
                 <input
+                  required
                   className='form-control'
                   name='address'
                   type='text'
@@ -396,8 +397,8 @@ export default function EmployeeComponent() {
                     <select
                       className='form-control'
                       name='idTeam'
+                      required
                       onChange={handleChangeInput}
-                      // defaultValue={teams[0].id}
                     >
                       {teams.map((team) => {
                         return (
@@ -406,7 +407,6 @@ export default function EmployeeComponent() {
                           </option>
                         );
                       })}
-                      {/* {renderOption()} */}
                     </select>
                   </div>
                 </div>
@@ -414,6 +414,7 @@ export default function EmployeeComponent() {
                   <small className='form-text text-muted'>Sex employee *</small>
                   <div className='form-group'>
                     <select
+                      required
                       className='form-control'
                       name='sex'
                       onChange={handleChangeInput}
@@ -429,6 +430,7 @@ export default function EmployeeComponent() {
                 <div className='col-6'>
                   <small className='form-text text-muted'>Age employee *</small>
                   <input
+                    required
                     className='form-control'
                     name='age'
                     type='text'
@@ -440,6 +442,7 @@ export default function EmployeeComponent() {
                   <small className='form-text text-muted'>Start day *</small>
                   <div className='form-group'>
                     <input
+                      required
                       type='date'
                       name='startDay'
                       className='form-control'
@@ -452,6 +455,7 @@ export default function EmployeeComponent() {
                 <div className='col-6'>
                   <small className='form-text text-muted'>Money/hour *</small>
                   <input
+                    required
                     className='form-control'
                     name='salaryPerHour'
                     type='text'
@@ -462,6 +466,7 @@ export default function EmployeeComponent() {
                 <div className='col-6'>
                   <small className='form-text text-muted'>Phone number *</small>
                   <input
+                    required
                     className='form-control'
                     name='phoneNumber'
                     type='text'
